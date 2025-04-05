@@ -10,17 +10,26 @@ global_opts = {
 
 last_writter = [];
 
+audio = null;
 
 Reveal.initialize({
     hash: true,
     transition: 'concave',
     transitionSpeed: 'slow',
-    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealZoom ]
+    autoPlayMedia: true,
+}).then(() => {
+    audio = new Audio("song.mp3");
 });
 
+const isVideoFragment = (event) => event.fragment.nodeName === 'VIDEO';
+
+Reveal.addEventListener('fragmenthidden', (event) => {
+  if (isVideoFragment(event)) {
+    event.fragment.pause();
+  }
+});
 
 Reveal.on('fragmentshown', (event) => {
-
     if (event.fragment.id === 'typewriter-introduction') {
         last_writter.push(new Typed("#typewriter-introduction", {
             strings: [
@@ -36,6 +45,10 @@ Reveal.on('fragmentshown', (event) => {
             typeSpeed: 50,
         }));
     }
+
+    if (isVideoFragment(event)) {
+        event.fragment.play();
+    }
 });
 
 
@@ -48,19 +61,10 @@ Reveal.on('slidechanged', (event) => {
             ...global_loop_opts,
             ...global_opts,
         }));
-        new Audio("song.mp3").play();
-    } else if (event.currentSlide.id === 'last-slide') {
-        kill_writter();
-        last_writter.push(new Typed("#last-slide-typed", {
-            strings: [
-                "Thank you for taking the time to view this presentation."            
-            ],
-            ...global_loop_opts,
-            ...global_opts,
-        }));
+        audio.play();
     } else if (event.currentSlide.id === 'sources') {
         kill_writter();
-        last_writter.push(new Typed("#last-slide-typed", {
+        last_writter.push(new Typed("#sources-writter-0", {
             strings: [
                 "Sources."            
             ],
@@ -200,11 +204,11 @@ Reveal.on('slidetransitionend', (event) => {
             ],
             ...global_opts,
         })
-    } else if (event.currentSlide.id === 'conclusion-slide') {
+    } else if (event.currentSlide.id === 'last-slide') {
         kill_writter();
-        last_type_slide = new Typed("#sixteenth-slide-writter-0", {
+        last_type_slide = new Typed("#last-slide-writter-0", {
             strings: [
-                "2023."            
+                "Thank You!"
             ],
             ...global_opts,
         })
